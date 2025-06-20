@@ -1,4 +1,5 @@
 from fastapi import FastAPI,HTTPException,Depends
+from fastapi.middleware.cors import CORSMiddleware
 from models.user import UserCreate,UserLogin
 from database import users_collection
 from utils.hash import hash_password,verify_password
@@ -9,7 +10,33 @@ from models.flashcard import FlashcardCreateRequest, FlashcardCreateResponse, Fl
 from services.gemini import generate_flashcard
 from database import flashcards_collection
 
-app = FastAPI()
+app = FastAPI(
+    title="FlashCard AI API",
+    description="AI-powered flashcard generator with authentication",
+    version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",      # React default dev server
+        "http://localhost:5173",      # Vite default dev server
+        "http://127.0.0.1:3000",      # Alternative localhost
+        "http://127.0.0.1:5173",      # Alternative localhost
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {
+        "message": "Welcome to FlashCard AI API",
+        "version": "1.0.0",
+        "docs": "/docs"
+    }
 
 @app.post("/register")
 def register_user(user: UserCreate):
