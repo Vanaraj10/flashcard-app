@@ -38,6 +38,10 @@ def read_root():
         "docs": "/docs"
     }
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "API is running"}
+
 @app.post("/register")
 def register_user(user: UserCreate):
     if users_collection.find_one({"email": user.email}):
